@@ -1,4 +1,6 @@
 # This is a sample Python script.
+import time
+
 import pandas as pd
 import requests
 from selenium import webdriver
@@ -11,10 +13,18 @@ from bs4 import BeautifulSoup
 
 
 def test():
-    driver = webdriver.Chrome('/Users/gal.bachar/git_wa/HIT/Data-science-Weather/chromedriver')
+    driver = webdriver.Chrome('C:/Users/yuval/PycharmProjects/Data-science-Weather/chromedriver/chromedriver')
     df = pd.DataFrame([], columns=["year", "month", "day", "temp", "humidity", "windspeed", "precipitation"])
     df_row_count=1
-    for year in range(2010,2022):
+
+    # switch temp from fahrenheit to celsius
+    driver.get(f"https://www.wunderground.com/history/monthly/us/ny/new-york-city/KLGA/date/2000-1")
+    settings = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "wuSettings")))
+    settings.click()
+    time.sleep(2)
+    celsius = driver.find_element(By.XPATH, '//*[@id="wuSettings-quick"]/div/a[2]').click()
+
+    for year in range(2000,2022):
         for month in range(1,13):
             driver.get(f"https://www.wunderground.com/history/monthly/us/ny/new-york-city/KLGA/date/{year}-{month}")
             table_id= WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "days")))
@@ -30,8 +40,8 @@ def test():
                 day_data = [year,month,day,temp,humidity,windspeed,precipitation]
                 df.loc[df_row_count] = day_data
                 df_row_count+=1
-
     driver.quit()
+    print(df)
 
 
 # Press the green button in the gutter to run the script.
