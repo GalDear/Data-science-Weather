@@ -9,13 +9,14 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
+Shahar = "/Users/yuval/PycharmProjects/Data-science-Weather/chromedriver/chromedriver"
+Gal = '/Users/gal.bachar/git_wa/HIT/Data-science-Weather/chromedriver/chromedriver'
 
 
 def data_collect():
     chrome_options = Options()
     chrome_options.add_argument("--headless")
-    driver = webdriver.Chrome('/Users/gal.bachar/git_wa/HIT/Data-science-Weather/chromedriver/chromedriver',
-                              options=chrome_options)
+    driver = webdriver.Chrome("C:/Users/yuval/PycharmProjects/Data-science-Weather/chromedriver/chromedriver")#, options=chrome_options)
     df = pd.DataFrame([], columns=["year", "month", "day", "temp", "humidity", "windspeed", "precipitation"])
     df_row_count=1
 
@@ -49,7 +50,7 @@ def data_collect():
                 print(f"cloud not get {year}-{month} data: {e}")
 
     driver.quit()
-    #df.to_csv('~/Documents/nyc_weather.csv',index=False) #for debugging
+    df.to_csv('~/Documents/nyc_weather.csv',index=False) #for debugging
     return df
 
 
@@ -64,8 +65,52 @@ def normalize_data(data_df, good_weather_values):
             norm_df.loc[(norm_df[i] < good_min), i] = 1 - ((good_min - norm_df[i]) / diff_min)
             norm_df.loc[(norm_df[i] > good_max), i] = 1 - ((norm_df[i] - good_max) / diff_max)
             norm_df.loc[(norm_df[i] <= good_max) & (norm_df[i] >= good_min), i] = 1
+    # norm_df.to_csv('~/Documents/nyc_weather_norm.csv', index=False)  # for debugging
     return norm_df
 
+
+
+def calculate_values(row, good_weather_values):
+    if (row[3] >= good_weather_values["temp"][0]) and (row[3] <= good_weather_values["temp"][1]):  # checking temp
+        temp_value = 1
+    elif row[3] < good_weather_values["temp"][0]:
+        temp_value = row[3] / good_weather_values["temp"][0]
+    elif row[3] > good_weather_values["temp"][1]:
+        temp_value = good_weather_values["temp"][1] / row[3]
+
+    if (row[4] >= good_weather_values["humidity"][0]) and (row[4] <= good_weather_values["humidity"][1]):  # checking humidity
+        humidity_value = 1.0
+    elif row[4] < good_weather_values["humidity"][0]:
+        humidity_value = row[4] / good_weather_values["humidity"][0]
+    elif row[4] > good_weather_values["humidity"][1]:
+        humidity_value = good_weather_values["humidity"][1]/ row[4]
+
+    if (row[5] >= good_weather_values["windspeed"][0]) and (row[5] <= good_weather_values["windspeed"][1]):  # checking windspeed
+        windspeed_value = 1
+    elif row[5] < good_weather_values["windspeed"][0]:
+        windspeed_value = row[5] / good_weather_values["windspeed"][0]
+    elif row[5] > good_weather_values["windspeed"][1]:
+        windspeed_value = good_weather_values["windspeed"][1] / row[5]
+
+    if (row[6] >= good_weather_values["precipitation"][0]) and (row[6] <= good_weather_values["precipitation"][1]):  # checking precipitation
+        precipitation_value = 1
+    elif row[6] < good_weather_values["precipitation"][0]:
+        precipitation_value = row[6] / good_weather_values["precipitation"][0]
+    elif row[6] > good_weather_values["precipitation"][1]:
+        precipitation_value = good_weather_values["precipitation"][1] / row[6]
+
+    return (precipitation_value + windspeed_value + humidity_value + temp_value) / 4
+
+
+def pleasant(data_df, good_weather_values):
+    plea_df = data_df.copy()
+    plea_df.insert(7,"Pleasant Day", 0)
+    for index, row in plea_df.iterrows():
+        pleasant_value = calculate_values(row, good_weather_values)
+        plea_df.loc[index, ["Pleasant Day"]] = pleasant_value
+        #if pleasant_value >= 0.8:
+        #    plea_df.loc[index, ["Pleasant Day"]] = pleasant_value
+    return plea_df
 
 if __name__ == '__main__':
     # nice weather:
@@ -73,7 +118,15 @@ if __name__ == '__main__':
     # humidity 30-50%
     # windspeed 0-7
     # precipitation 0 - 0.5
-    good_weather_values = {'temp': [18,25], 'humidity':[40,50],'windspeed':[4,10], 'precipitation':[0,0.5]}
-    df = data_collect()
-    # df = pd.read_csv('~/Documents/nyc_weather.csv') # for debugging
+    good_weather_values = {'temp': [18,25], 'humidity':[30,50],'windspeed':[4,20], 'precipitation':[0,0.5]}
+    # df = data_collect()
+    df = pd.read_csv('~/Documents/nyc_weather.csv') # for debugging
     norm_df = normalize_data(df, good_weather_values)
+    df_with_plea = pleasant(df, good_weather_values)
+
+
+    count = 0       # counting pleasant days
+    for row in df_with_plea.iterrows():
+        if(row[1][7] >= 0.85):
+            count+=1
+    print(count)
