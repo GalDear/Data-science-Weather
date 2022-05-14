@@ -1,6 +1,7 @@
 # This is a sample Python script.
 import time
 
+import matplotlib
 import pandas as pd
 import requests
 from selenium import webdriver
@@ -8,7 +9,11 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from bs4 import BeautifulSoup
+import numpy as np
+
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+
 Shahar = "/Users/yuval/PycharmProjects/Data-science-Weather/chromedriver/chromedriver"
 Gal = '/Users/gal.bachar/git_wa/HIT/Data-science-Weather/chromedriver/chromedriver'
 
@@ -74,7 +79,20 @@ def normalize_data(data_df, good_weather_values):
 
     return norm_df
 
+
 def remove_missing_data(data):
+    data.loc[data["year"] <= 2014, "precipitation"] = np.NaN
+    return data
+
+
+def num_of_good_days_per_month(data):
+    fig, axes = plt.subplots(1, 1, figsize=(20, 5))
+    res = {}
+    for i in range(1,12):
+        res[i] = len(data.loc[(data['month'] == 1) & (data['pleasant day'] >= 0.85)])
+    ser = pd.Series(res)
+    ser.plot(kind='pie', ax=axes[0])
+
 
 
 if __name__ == '__main__':
@@ -86,7 +104,9 @@ if __name__ == '__main__':
     good_weather_values = {'temp': [18,25], 'humidity':[30,50],'windspeed':[4,20], 'precipitation':[0,1]}
     # df = data_collect()
     df = pd.read_csv('~/Documents/nyc_weather.csv') # for debugging
-    norm_df = normalize_data(df, good_weather_values)
+    fixed_data = remove_missing_data(df)
+    norm_df = normalize_data(fixed_data, good_weather_values)
+    num_of_good_days_per_month(norm_df)
 
 
     count = 0       # counting pleasant days
