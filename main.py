@@ -21,7 +21,7 @@ Gal = '/Users/gal.bachar/git_wa/HIT/Data-science-Weather/chromedriver/chromedriv
 def data_collect():
     chrome_options = Options()
     chrome_options.add_argument("--headless")
-    driver = webdriver.Chrome("C:/Users/yuval/PycharmProjects/Data-science-Weather/chromedriver/chromedriver")#, options=chrome_options)
+    driver = webdriver.Chrome("C:/Users/yuval/Desktop/Shahar/Data-science-Weather/chromedriver")#, options=chrome_options)
     df = pd.DataFrame([], columns=["year", "month", "day", "temp", "humidity", "windspeed", "precipitation"])
     df_row_count=1
 
