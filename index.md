@@ -6,7 +6,7 @@ In our project we predict if a selected day in the future will be a pleasant day
 
 ### Project page
 
-[Source code]()
+[Source code](./main.html)
 
 ### Project presentation 
 
@@ -19,5 +19,6 @@ In our project we predict if a selected day in the future will be a pleasant day
 
 ### Project submitters
 Shahar Baba
+
 Gal Bachar
 
