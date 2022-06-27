@@ -6,7 +6,7 @@ In our project we predict if a selected day in the future will be a pleasant day
 
 ### Project page
 
-[Source code](./main.html)
+[Source code](https://galdear.github.io/Data-science-Weather/main.ipynb)
 
 ### Project presentation 
 
