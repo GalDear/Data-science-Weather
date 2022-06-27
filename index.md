@@ -2,7 +2,7 @@
 
 HIT, Data scince course - Weather prediction. 
 
-In our project we try to predict if a selected day in the future will be a pleasant day by using historical data and Machine learning.
+In our project we predict if a selected day in the future will be a pleasant day by using historical data and Machine learning.
 
 ### Project page
 
