@@ -10,7 +10,7 @@ In our project we predict if a selected day in the future will be a pleasant day
 
 ### Project presentation 
 
-[Presentation](url)
+[Presentation](https://galdear.github.io/Data-science-Weather/Data-Science-Weather.pptx)
 
 ### Data source
 
